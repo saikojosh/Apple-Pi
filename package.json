@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "name": "newgen-crm",
+  "version": "0.0.1",
+  "main": "main.js",
+  "contributors": [
+    {
+      "name": "Josh Cole",
+      "email": "josh.cole@newgenrecruitment.com"
+    }
+  ],
+  "dependencies": {
+    "async": "0.9.x",
+    "config-ninja": "0.0.x",
+    "log-ninja": "1.1.x",
+    "moment": "2.8.x",
+    "object-extender": "1.2.x",
+    "underscore": "1.7.x"
+  },
+  "devDependencies": {
+    "nodemon": "1.2.x"
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  }
+}
