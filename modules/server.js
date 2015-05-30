@@ -27,8 +27,8 @@ ME.boot = function (port, callback) {
 ME.handleRequests = function (req, res) {
 
   // Add helper methods to the response (whilst maintaining the scope to 'this').
-  res.respond  = function (data, code)      { ME.resRespond.call (ME, req, res, data, code);      };
-  res.errorOut = function (code, customMsg) { ME.resErrorOut.call(ME, req, res, code, customMsg); };
+  res.dataOut  = function (success, output, code) { ME.resRespond.call (ME, req, res, success, output, code); };
+  res.errorOut = function (code, customMsg)       { ME.resErrorOut.call(ME, req, res, code, customMsg);       };
 
   // Split up the URL.
   var urlParts = req.url.match(/\/([a-z0-9]+)\/([a-z0-9]+)\/?/i);
@@ -55,13 +55,22 @@ ME.handleRequests = function (req, res) {
 };
 
 /*
- * A response helper method to output an object as JSON.
+ * A response helper method to output a success message.
  */
-ME.resRespond = function (req, res, data, code) {
+ME.resDataOut = function (req, res, success, output, code) {
   code = code || 200;
-  var message = JSON.stringify(data);
+
+  // Construct the response.
+  var data = {
+    success: success,
+    code:    code,
+    output:  output
+  };
+
+  // Output the data.
   res.writeHead(code, { 'Content-Type': 'application/json' });
-  res.end(message);
+  res.end(JSON.stringify(data));
+
 };
 
 /*
@@ -77,8 +86,16 @@ ME.resErrorOut = function (req, res, code, customMsg) {
     case 500: msg = 'Internal Server Error';    break;
   }
 
+  // Construct the response.
+  var data = {
+    success: false,
+    code:    code,
+    error:   'HTTP Error: ' + msg,
+    human:   customMsg || null
+  };
+
   // Output the error message.
-  res.writeHead(code, { 'Content-Type': 'text/plain' });
-  res.end('HTTP Error ' + code + (msg ? ' ' + msg : '') + (customMsg ? '\n\n' + customMsg : ''));
+  res.writeHead(code, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
 
 };
