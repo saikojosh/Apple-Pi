@@ -14,6 +14,7 @@ var config      = require('config-ninja').init(configDir, env);
 var logger      = require('log-ninja').init(config.environment.level);
 var async       = require('async');
 var moment      = require('moment');
+var light       = require('./modules/light');
 var server      = require('./modules/server');
 
 // Start boot process.
@@ -27,6 +28,20 @@ async.waterfall([
     logger.box('info', 'Node Version: ' + nodeVersion);
     logger.box('info', 'Boot Time: ' + moment().format('DD/MM/YYYY HH:mm:ss'));
     logger.important('------------------------------------------------------');
+
+    // Continue.
+    return next(null);
+
+  },
+
+  // Handle program exits.
+  function (next) {
+
+    // Tidy up on exit.
+    process.on('SIGINT', function () {
+      light.tidyUp();
+      process.exit(0);
+    });
 
     // Continue.
     return next(null);
