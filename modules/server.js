@@ -2,8 +2,9 @@
  * SERVER
  */
 
-var ME   = module.exports;
-var http = require('http');
+var ME       = module.exports;
+var http     = require('http');
+var security = require('./security');
 
 /*
  * Boot the server and attach the handler method.
@@ -41,8 +42,15 @@ ME.handleRequests = function (req, res) {
   var command = module[urlParts[2]];
   if (typeof command !== 'function') { return res.errorOut(500, 'Invalid command.'); }
 
-  // Run the command.
-  return command(req, res);
+  // Validate the request.
+  security.validateRequest(req, function (err) {
+
+    if (err) { return res.errorOut(500, 'Failed security check.'); }
+
+    // Run the command.
+    return command(req, res);
+
+  });
 
 };
 
