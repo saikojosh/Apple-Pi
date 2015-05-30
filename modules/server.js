@@ -42,7 +42,7 @@ ME.handleRequests = function (req, res) {
       if (!urlParts) { return next('Invalid URL.'); }
 
       // Load the module.
-      module = require('../commands/' + urlParts[1]);
+      module = require('../commands/' + urlParts[1] + '.comm');
       if (!module || typeof module !== 'object') {
         return next('Invalid module.');
       }

@@ -2,12 +2,19 @@
  * LIGHT COMMANDS
  */
 
-var ME = module.exports;
+var ME    = module.exports;
+var light = require('../modules/light');
 
 /*
  * Set the light to a specific level.
  */
 ME['set'] = function (req, res) {
+
+  // Change the light value.
+  light.set(req.body.value, function (err) {
+    if (err) { return res.errorOut(500, 'Failed to set light value.'); }
+    res.dataOut(true);
+  });
 
 };
 
