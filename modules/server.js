@@ -26,29 +26,125 @@ ME.boot = function (port, callback) {
  */
 ME.handleRequests = function (req, res) {
 
+  var module, command;
+
   // Add helper methods to the response (whilst maintaining the scope to 'this').
   res.dataOut  = function (success, output, code) { ME.resRespond.call (ME, req, res, success, output, code); };
   res.errorOut = function (code, customMsg)       { ME.resErrorOut.call(ME, req, res, code, customMsg);       };
 
-  // Split up the URL.
-  var urlParts = req.url.match(/\/([a-z0-9]+)\/([a-z0-9]+)\/?/i);
-  if (!urlParts) { return res.errorOut(500, 'Invalid URL.'); }
+  async.waterfall([
 
-  // Load the module.
-  var module = require('../commands/' + urlParts[1]);
-  if (typeof module !== 'object') { return res.errorOut(500, 'Invalid module.'); }
+    // Ensure the command exists.
+    function validateCommand (next) {
 
-  // Get the command.
-  var command = module[urlParts[2]];
-  if (typeof command !== 'function') { return res.errorOut(500, 'Invalid command.'); }
+      // Split up the URL.
+      var urlParts = req.url.match(/\/([a-z0-9]+)\/([a-z0-9]+)\/?/i);
+      if (!urlParts) { return next('Invalid URL.'); }
 
-  // Validate the request.
-  security.validateRequest(req, function (err) {
+      // Load the module.
+      module = require('../commands/' + urlParts[1]);
+      if (!module || typeof module !== 'object') {
+        return next('Invalid module.');
+      }
 
-    if (err) { return res.errorOut(500, 'Failed security check.'); }
+      // Get the command.
+      command = module[urlParts[2]];
+      if (!command || typeof command !== 'function') {
+        return next('Invalid command.');
+      }
+
+      // Continue.
+      return next(null);
+
+    },
+
+    // Ensure the request is secure.
+    function validateRequest (next) {
+
+      security.validateRequest(req, function (err) {
+        if (err) { return next('Failed security check.'); }
+        return next(null);
+      });
+
+    },
+
+    // Ensure we get the body data if this is a
+    function collectBodyData (next) {
+
+      // No post data.
+      if (req.method !== 'POST') {
+        req.body = null;
+        return next(null);
+      }
+
+      // Get the body and immediately call next.
+      return ME.collectBodyData(req, function (err, body) {
+
+        // Save the processed body to the request.
+        req.body = body;
+
+        if (err) { return next(err); }
+        return next(null);
+
+      });
+
+    }
+
+  ], function (err) {
+
+    if (err) {
+      var errCode = (typeof err === 'number' ? err : 500);
+      var errMsg  = (typeof err === 'string' ? err : null);
+      return res.errorOut(errCode, errMsg);
+    }
 
     // Run the command.
     return command(req, res);
+
+  });
+
+};
+
+/*
+ * Collect any incoming POST body data.
+ * callback(err, body);
+ */
+ME.collectBodyData = function (req, callback) {
+
+  // We are going to be receiving post data.
+  var body         = '';
+  var maxPostBytes = (1024 * 1024 * config.maxPostMB);
+
+  // Receive some data manually.
+  req.on('data', function (data) {
+
+    // Add the next chunk of data.
+    body += data;
+
+    // If the body grows too big...
+    if (body.length > maxPostBytes) { return callback(413, body); }
+
+  });
+
+  // Request finished, handle the route with POST data.
+  req.on('end', function () {
+
+    // Can we parse a query string?
+    if (req.headers['content-type'].match(/application\/x-www-form-urlencoded/gi)) {
+      body = qs.parse(body);
+      return callback(null, body);
+    }
+
+    // Can we parse JSON?
+    else if (req.headers['content-type'].match(/application\/json/gi)) {
+      try {
+        body = JSON.parse(body);
+      }
+      catch (e) {
+        return callback('Unable to parse JSON POST body.', body);
+      }
+      return callback(null, body);
+    }
 
   });
 
