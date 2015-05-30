@@ -7,10 +7,15 @@ var shell = require('../modules/shell');
 
 /*
  * Reboot the system.
+ * [params]
+ *  grace (int>15) The grace period to wait before rebooting the system.
  */
 ME['reboot'] = function (req, res) {
 
-  shell.exec('shutdown', '-r -i6 -g15 "*** Rebooting Now! ****"', function (err) {
+  var grace = req.body.grace || config.shutdownGrace;
+  var flags = '-r -i6 -g' + grace + ' "*** Rebooting Now! ****"';
+
+  shell.exec('shutdown', flags, function (err) {
     if (err) { return res.errorOut(500, 'Command failed.'); }
     return res.dataOut(true);
   });
@@ -19,10 +24,15 @@ ME['reboot'] = function (req, res) {
 
 /*
  * Shut down the system.
+ * [params]
+ *  grace (int>15) The grace period to wait before rebooting the system.
  */
 ME['shutdown'] = function (req, res) {
 
-  shell.exec('shutdown', '-y -i6 -g15 "*** Shutting Down Now! ****"', function (err) {
+  var grace = req.body.grace || config.shutdownGrace;
+  var flags = '-y -i6 -g' + grace + ' "*** Shutting Down Now! ****"';
+
+  shell.exec('shutdown', flags, function (err) {
     if (err) { return res.errorOut(500, 'Command failed.'); }
     return res.dataOut(true);
   });

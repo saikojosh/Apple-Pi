@@ -4,5 +4,7 @@
     "name": "production"
   },
   "appName": "Apple Pi",
-  "port": 5000
+  "port": 5000,
+  "maxPostMB": 1,
+  "shutdownGrace": 15
 }
