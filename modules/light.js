@@ -4,6 +4,7 @@
 
 var ME        = module.exports;
 var async     = require('async');
+var logger    = require('log-ninja');
 var lightGPIO = require('./light-gpio');
 
 /*
@@ -13,12 +14,18 @@ var lightGPIO = require('./light-gpio');
 ME.set = function (value, callback) {
   callback = require('func-it')(callback);
 
+  logger.debug('[light] SET ' + value);
+
   // Prepare and error check the value.
   value = ME.parseValue(value);
   if (value === false) { return callback('Invalid light value.'); }
 
+  logger.debug('[light] BINARY ' + value.join(','));
+
   // Set each pin.
   async.forEachOf(lightGPIO, function (pin, key, next) {
+
+    logger.debug('[light] PIN ' + pin.gpio + ' TO ' + value[key]);
 
     // Write the pin and call the next method.
     pin.write(value[key], next);
