@@ -37,10 +37,12 @@ async.waterfall([
   // Handle program exits.
   function prepareApplicationExit (next) {
 
-    // Tidy up on exit.
+    // Turn off the light and free up the resources on application exit.
     process.on('SIGINT', function () {
-      light.tidyUp();
-      process.exit(0);
+      light.set(0, function (err) {
+        light.tidyUp();
+        process.exit(0);
+      });
     });
 
     // Continue.
