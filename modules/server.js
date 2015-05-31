@@ -4,6 +4,8 @@
 
 var ME       = module.exports;
 var http     = require('http');
+var async    = require('async');
+var config   = require('config-ninja');
 var security = require('./security');
 
 /*
@@ -29,7 +31,7 @@ ME.handleRequests = function (req, res) {
   var module, command;
 
   // Add helper methods to the response (whilst maintaining the scope to 'this').
-  res.dataOut  = function (success, output, code) { ME.resRespond.call (ME, req, res, success, output, code); };
+  res.dataOut  = function (success, output, code) { ME.resDataOut.call (ME, req, res, success, output, code); };
   res.errorOut = function (code, customMsg)       { ME.resErrorOut.call(ME, req, res, code, customMsg);       };
 
   async.waterfall([
@@ -58,16 +60,6 @@ ME.handleRequests = function (req, res) {
 
     },
 
-    // Ensure the request is secure.
-    function validateRequest (next) {
-
-      security.validateRequest(req, function (err) {
-        if (err) { return next('Failed security check.'); }
-        return next(null);
-      });
-
-    },
-
     // Ensure we get the body data if this is a
     function collectBodyData (next) {
 
@@ -86,6 +78,16 @@ ME.handleRequests = function (req, res) {
         if (err) { return next(err); }
         return next(null);
 
+      });
+
+    },
+
+    // Ensure the request is secure.
+    function validateRequest (next) {
+
+      security.validateRequest(req, function (err) {
+        if (err) { return next('Failed security check.'); }
+        return next(null);
       });
 
     }
