@@ -9,8 +9,8 @@ var GPIO = require('onoff').Gpio;
  * The light output pins are: 0, 1, 4, 7, 8, 9, 10 & 11.
  */
 module.exports = [
-  new GPIO(0,  'out'),
-  new GPIO(1,  'out'),
+  new GPIO(2,  'out'),
+  new GPIO(3,  'out'),
   new GPIO(4,  'out'),
   new GPIO(7,  'out'),
   new GPIO(8,  'out'),
