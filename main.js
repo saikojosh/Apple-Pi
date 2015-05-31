@@ -52,8 +52,18 @@ async.waterfall([
   // Turn off the light.
   function prepareLight (next) {
 
-    light.set(0, next);
-    logger.box('ok', 'Reset light.');
+    light.set(0, function (err) {
+
+      if (err) {
+        logger.box('fail', 'Reset light.');
+        return next(err);
+      }
+
+      // Continue.
+      logger.box('ok', 'Reset light.');
+      return next(null);
+
+    });
 
   },
 
