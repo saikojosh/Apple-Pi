@@ -34,7 +34,8 @@ ME['reboot'] = function (req, res) {
   var grace = req.body.grace || config.shutdownGrace;
   var flags = '-r -i6 -g' + grace + ' "*** Rebooting Now! ****"';
 
-  shell.exec('shutdown', flags, function (err) {
+  shell.exec('sudo shutdown', flags, function (err) {
+    logger.error(err);
     if (err) { return res.errorOut(500, 'Command failed.'); }
     return res.dataOut(true);
   });
@@ -53,7 +54,7 @@ ME['shutdown'] = function (req, res) {
   var grace = req.body.grace || config.shutdownGrace;
   var flags = '-y -i6 -g' + grace + ' "*** Shutting Down Now! ****"';
 
-  shell.exec('shutdown', flags, function (err) {
+  shell.exec('sudo shutdown', flags, function (err) {
     if (err) { return res.errorOut(500, 'Command failed.'); }
     return res.dataOut(true);
   });
