@@ -4,6 +4,7 @@
 
 var ME     = module.exports;
 var config = require('config-ninja');
+var logger = require('log-ninja');
 var shell  = require('../modules/shell');
 
 /*
@@ -11,7 +12,13 @@ var shell  = require('../modules/shell');
  */
 ME['update'] = function (req, res) {
 
-  // TO DO: Update command,
+  logger.info('[os.comm] UPDATE');
+
+
+  // TO DO: Update command
+
+
+  return res.errorOut(500, 'Not implemented.');
 
 };
 
@@ -21,6 +28,8 @@ ME['update'] = function (req, res) {
  *  grace (int>15) The grace period to wait before rebooting the system.
  */
 ME['reboot'] = function (req, res) {
+
+  logger.info('[os.comm] REBOOT');
 
   var grace = req.body.grace || config.shutdownGrace;
   var flags = '-r -i6 -g' + grace + ' "*** Rebooting Now! ****"';
@@ -38,6 +47,8 @@ ME['reboot'] = function (req, res) {
  *  grace (int>15) The grace period to wait before rebooting the system.
  */
 ME['shutdown'] = function (req, res) {
+
+  logger.info('[os.comm] SHUTDOWN');
 
   var grace = req.body.grace || config.shutdownGrace;
   var flags = '-y -i6 -g' + grace + ' "*** Shutting Down Now! ****"';
