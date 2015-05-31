@@ -6,6 +6,15 @@ var ME    = module.exports;
 var shell = require('../modules/shell');
 
 /*
+ * Updates the system.
+ */
+ME['update'] = function (req, res) {
+
+  // TO DO: Update command,
+
+};
+
+/*
  * Reboot the system.
  * [params]
  *  grace (int>15) The grace period to wait before rebooting the system.
