@@ -13,19 +13,9 @@ var lightGPIO = require('./lightGPIO');
 ME.set = function (value, callback) {
   callback = require('func-it')(callback);
 
-  // Parse the light value.
-  try {
-    value = parseInt(value, 10);
-  }
-  catch (err) {
-    return callback('Invalid light value.');
-  }
-
-  // Check the light value.
-  if (value < 0 || value > 255) { return callback('Invalid light value.'); }
-
-  // Convert to binary.
-  var binVal = valueToBinary(value);
+  // Prepare and error check the value.
+  value = ME.parseValue(value);
+  if (value === false) { return callback('Invalid light value.'); }
 
   // Set each pin.
   async.forEachOf(lightGPIO, function (pin, key, next) {
@@ -37,6 +27,27 @@ ME.set = function (value, callback) {
     if (err) { return callback(err); }
     return callback(null);
   });
+
+};
+
+/*
+ * Prepare the value and check for errors.
+ */
+ME.parseValue = function (value) {
+
+  // Parse the light value.
+  try {
+    value = parseInt(value, 10);
+  }
+  catch (err) {
+    return false;
+  }
+
+  // Check the light value.
+  if (value < 0 || value > 255) { return false; }
+
+  // Convert to binary.
+  return valueToBinary(value);
 
 };
 
