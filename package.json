@@ -10,7 +10,7 @@
     }
   ],
   "dependencies": {
-    "async": "0.9.x",
+    "async": "1.0.x",
     "config-ninja": "0.0.x",
     "func-it": "1.0.x",
     "log-ninja": "1.1.x",
