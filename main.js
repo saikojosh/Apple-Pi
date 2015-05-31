@@ -35,7 +35,7 @@ async.waterfall([
   },
 
   // Handle program exits.
-  function (next) {
+  function prepareApplicationExit (next) {
 
     // Tidy up on exit.
     process.on('SIGINT', function () {
@@ -47,9 +47,16 @@ async.waterfall([
     return next(null);
 
   },
+  
+  // Turn off the light.
+  function prepareLight (next) {
+
+    light.set(0, next);
+
+  },
 
   // Prepare the web server.
-  function (next) {
+  function bootWebServer (next) {
 
     server.boot(config.port, function (err, port) {
 
