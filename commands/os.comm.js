@@ -25,7 +25,7 @@ ME['update'] = function (req, res) {
 /*
  * Reboot the system.
  * [params]
- *  grace (int>15) The grace period to wait before rebooting the system.
+ *  grace (int) The grace period to wait before rebooting the system.
  */
 ME['reboot'] = function (req, res) {
 
@@ -45,7 +45,7 @@ ME['reboot'] = function (req, res) {
 /*
  * Shut down the system.
  * [params]
- *  grace (int>15) The grace period to wait before rebooting the system.
+ *  grace (int) The grace period to wait before rebooting the system.
  */
 ME['shutdown'] = function (req, res) {
 

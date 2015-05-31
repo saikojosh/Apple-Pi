@@ -6,5 +6,5 @@
   "appName": "Apple Pi",
   "port": 5000,
   "maxPostMB": 1,
-  "shutdownGrace": 15
+  "shutdownGrace": 1
 }
