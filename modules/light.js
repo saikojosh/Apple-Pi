@@ -31,6 +31,57 @@ ME.set = function (value, callback) {
 };
 
 /*
+ * Gradually increase/decrease the light level over a given duration (in mins).
+ */
+ME.graduate = function (startValue, endValue, duration, callback) {
+
+  // Error check the values.
+  if (ME.parseValue(startValue) === false) { return callback('Invalid light start value.'); }
+  if (ME.parseValue(endValue)   === false) { return callback('Invalid light end value.');   }
+
+  // Convert duration from minutes to milliseconds.
+  duration = (1000 * 60 * duration);
+
+  var direction = (startValue < endValue ? 'up' : 'down');
+  var steps     = Math.abs(endValue - startValue);
+  var pause     = duration / steps;
+  var curLevel  = startValue;
+  var firstStep = true;
+
+  // Increase/decrease the light level in steps.
+  async.whilst(function test () {
+    return (direction === 'up' ? (curLevel <= endValue) : (curLevel >= endValue));
+  }, function run (next) {
+
+    light.set(curLevel, function (err) {
+
+      if (err) { return next(err); }
+
+      // We only need to send a success response on the first step (no need to
+      // wait X minutes and no need to return).
+      if (firstStep) {
+        callback(null);
+        firstStep = false;
+      }
+
+      // Continue after a pause.
+      if (direction === 'up') { curLevel++; } else { curLevel--; }
+      setTimeout(next, pause);
+
+    });
+
+  }, function (err) {
+
+    // We only need to send a response if we get an error on the first step.
+    if (err && firstStep) {
+      return callback('Failed to set light value.');
+    }
+
+  });
+
+};
+
+/*
  * Prepare the value and check for errors.
  */
 ME.parseValue = function (value) {
