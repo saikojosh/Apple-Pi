@@ -4,7 +4,7 @@
 
 var ME        = module.exports;
 var async     = require('async');
-var lightGPIO = require('./lightGPIO');
+var lightGPIO = require('./light-gpio');
 
 /*
  * Sets the light to the given value.
@@ -21,7 +21,7 @@ ME.set = function (value, callback) {
   async.forEachOf(lightGPIO, function (pin, key, next) {
 
     // Write the pin and call the next method.
-    pin.write(binVal[key], next);
+    pin.write(value[key], next);
 
   }, function (err) {
     if (err) { return callback(err); }
@@ -98,7 +98,7 @@ ME.parseValue = function (value) {
   if (value < 0 || value > 255) { return false; }
 
   // Convert to binary.
-  return valueToBinary(value);
+  return ME.valueToBinary(value);
 
 };
 
