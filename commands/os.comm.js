@@ -2,8 +2,9 @@
  * OS COMMANDS
  */
 
-var ME    = module.exports;
-var shell = require('../modules/shell');
+var ME     = module.exports;
+var config = require('config-ninja');
+var shell  = require('../modules/shell');
 
 /*
  * Updates the system.
