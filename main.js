@@ -44,14 +44,16 @@ async.waterfall([
     });
 
     // Continue.
+    logger.box('ok', 'Prepare application exit.');
     return next(null);
 
   },
-  
+
   // Turn off the light.
   function prepareLight (next) {
 
     light.set(0, next);
+    logger.box('ok', 'Reset light.');
 
   },
 
